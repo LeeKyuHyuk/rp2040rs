@@ -20,7 +20,7 @@ fn main() {
     };
     rp2040_uart(&mut mcu, UART0_BASE, on_byte);
 
-    mcu.registers[PC] = 0x370;
+    mcu.registers[PC] = 0x10000370;
     for _index in 0..280 {
         execute_instruction(&mut mcu);
         // uncomment for debugging:

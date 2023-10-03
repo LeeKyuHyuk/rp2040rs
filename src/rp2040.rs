@@ -174,10 +174,9 @@ fn write_u32(rp2040: &mut RP2040, address: u32, value: u32) {
 }
 
 pub fn execute_instruction(rp2040: &mut RP2040) {
-    let flash16 = get_flash16_ptr_mut(&mut rp2040.flash);
     // ARM Thumb instruction encoding - 16 bits / 2 bytes
-    let opcode = flash16[(rp2040.registers[PC] / 2) as usize];
-    let opcode2 = flash16[(rp2040.registers[PC] / 2 + 1) as usize];
+    let opcode = read_u16(rp2040, rp2040.registers[PC]);
+    let opcode2 = read_u16(rp2040, rp2040.registers[PC] + 1);
     let opcode_pc = rp2040.registers[PC];
     rp2040.registers[PC] += 2;
     // ADCS
