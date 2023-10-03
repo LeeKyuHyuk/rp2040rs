@@ -1,27 +1,24 @@
 mod assembler;
 mod intelhex;
 mod rp2040;
+mod uart;
 
 use std::char::from_u32;
 
 use rp2040::*;
-
-const UART0_BASE: u32 = 0x40034000;
-const UARTDR: u32 = 0x0;
-const UARTFR: u32 = 0x18;
+use uart::*;
 
 fn main() {
     let mut mcu = initialize("./examples/hello_uart.hex");
 
-    mcu.write_hooks
-        .insert(UART0_BASE + UARTDR, |_address, value| {
-            println!(
-                "UART sent : {}",
-                from_u32(value & 0xFF)
-                    .expect("There is a problem converting ASCII codes to characters")
-            );
-        });
-    mcu.read_hooks.insert(UART0_BASE + UARTFR, |_| 0);
+    let on_byte: fn(address: u32, value: u32) = |_address, value| {
+        println!(
+            "UART sent : {}",
+            from_u32(value & 0xFF)
+                .expect("There is a problem converting ASCII codes to characters")
+        );
+    };
+    rp2040_uart(&mut mcu, UART0_BASE, on_byte);
 
     mcu.registers[PC] = 0x370;
     for _index in 0..280 {
